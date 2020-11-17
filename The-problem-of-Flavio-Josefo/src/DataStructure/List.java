@@ -12,11 +12,11 @@ public interface List<E> {
     
     public E add(int index, E element);
     
-    public E removeFirst(E element);
+    public E removeFirst();
     
-    public E removeLast(E element);
+    public E removeLast();
     
-    public E remove(int index, E element);
+    public E remove(int index);
     
     public E get(int index);
     
