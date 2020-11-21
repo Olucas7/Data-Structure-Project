@@ -1,10 +1,13 @@
 package DataStructure;
 
+import java.util.Iterator;
+
 /**
  *
  * @author oscarlucas7
+ * @param <E>
  */
-public interface List<E> {
+public interface List<E>{
     
     public E addFirst(E element);
     
@@ -27,6 +30,9 @@ public interface List<E> {
     public boolean isEmpty();
     
     public int size();
+    
+    public Iterator<E> iterator();
+    
     
     
     

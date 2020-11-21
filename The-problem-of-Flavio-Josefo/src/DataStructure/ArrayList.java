@@ -1,5 +1,7 @@
 package DataStructure;
 
+import java.util.Iterator;
+
 /**
  *
  * @author oscarlucas7
@@ -14,11 +16,11 @@ public class ArrayList<E> implements List<E> {
         effectiveSize = 0;
     }
     
-    public boolean isFull(){
+    private boolean isFull(){
         return effectiveSize == array.length;
     }
     
-    public void increaseCapacity(){
+    private void increaseCapacity(){
         E[] arrayHelper = (E[]) new Object[effectiveSize * 2];
         for (int i = 0; i < array.length; i++) {
             arrayHelper[i] = array[i];
@@ -38,7 +40,7 @@ public class ArrayList<E> implements List<E> {
             return array[0];
         }
         else{
-            for (int i = effectiveSize-1; i > 0; i--) {
+            for (int i = effectiveSize-1; i >= 0; i--) {
                 array[i+1] = array[i];
             }
             array[0] = element;
@@ -145,12 +147,20 @@ public class ArrayList<E> implements List<E> {
 
     @Override
     public E get(int index) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if(index > 0 && index < effectiveSize)
+            return array[index];
+        else
+            return null;
     }
 
     @Override
     public E set(int index, E element) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if(index > 0 && index < effectiveSize || element == null)
+            return null;
+        else{
+            array[index] = element;
+            return array[index];
+        }
     }
 
     @Override
@@ -168,4 +178,58 @@ public class ArrayList<E> implements List<E> {
     public int size() {
         return effectiveSize;
     }
+
+    @Override
+    public String toString() {
+        String list="[ ";
+        for (int i = 0; i < effectiveSize; i++) {
+            if(i != effectiveSize-1)
+                list+=array[i] + ", ";
+            else
+                list+= array[i] + " ]";
+        }
+        return list;
+    }
+
+    @Override
+    public Iterator<E> iterator() {
+        Iterator<E> iterator = new Iterator() {
+            int index = 0;
+            @Override
+            public boolean hasNext() {
+                return index < effectiveSize;
+                
+            }
+            @Override
+            public E next() {
+                E element = array[index];
+                index++;
+                return element;
+            }
+            
+        };
+        return iterator;
+    }
+    
+    
+
+    public static void main(String [] args){
+        ArrayList<Integer> a = new ArrayList<>();
+        a.addFirst(1);
+        a.addFirst(2);
+        a.addFirst(3);
+        a.addFirst(5);
+        a.addLast(6);
+        System.out.println(a.toString());
+        Iterator iterator = a.iterator();
+        while(iterator.hasNext()){
+            System.out.println(iterator.next());
+        }
+        
+        
+        
+        
+    }
+    
+    
  }
