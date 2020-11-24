@@ -217,9 +217,8 @@ public class ArrayList<E> implements List<E> {
         ArrayList<Integer> a = new ArrayList<>();
         a.addFirst(1);
         a.addFirst(2);
-        a.addFirst(3);
-        a.addFirst(5);
-        a.addLast(6);
+        a.add(2, 3);
+        a.addLast(0);
         System.out.println(a.toString());
         Iterator iterator = a.iterator();
         while(iterator.hasNext()){
