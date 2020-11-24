@@ -82,7 +82,7 @@ public class ArrayList<E> implements List<E> {
             return array[0];
         }
         else{
-            for (int i = effectiveSize-1; i != index; i--) {
+            for (int i = effectiveSize-1; i >= index; i--) {
                 array[i+1] = array[i];
             }
             array[index] = element;
@@ -215,10 +215,11 @@ public class ArrayList<E> implements List<E> {
 
     public static void main(String [] args){
         ArrayList<Integer> a = new ArrayList<>();
-        a.addFirst(1);
-        a.addFirst(2);
-        a.add(2, 3);
-        a.addLast(0);
+        a.add(0,0);
+        
+        System.out.println(a.add(1,1));
+        
+        
         System.out.println(a.toString());
         Iterator iterator = a.iterator();
         while(iterator.hasNext()){

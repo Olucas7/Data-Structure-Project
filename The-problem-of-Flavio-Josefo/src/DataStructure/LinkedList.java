@@ -62,8 +62,6 @@ public class LinkedList<E> implements List<E> {
             NodeList<E> newNode = new NodeList<>(element);
             if(index == 0)
                 return addFirst(element);
-            if(index == effectiveSize-1)
-                return addLast(element);
             int cursor=0;
             for (NodeList<E> i = this.first; i!=null ; i = i.getNext()) {
                 if(cursor == index-1){
@@ -136,6 +134,9 @@ public class LinkedList<E> implements List<E> {
                         effectiveSize--;
                         return removedNode.getContent();
                     }
+                    else{
+                        cursor++;
+                    }
                 }
             }
         }
@@ -176,6 +177,8 @@ public class LinkedList<E> implements List<E> {
                     if(cursor == index){
                         i.setContent(element);
                         return i.getContent();
+                    }else{
+                        cursor++;
                     }
                 }
             }
@@ -224,39 +227,45 @@ public class LinkedList<E> implements List<E> {
 
     @Override
     public String toString() {
-        String arraylist="[ ";
-        for (NodeList i = first; i != null; i = i.getNext()) {
-            if((i!=last)){
-                arraylist+=i.getContent() + ", ";
-            }else{
-                arraylist+= last.getContent() + " ]";
+        if(!isEmpty()){
+            String arraylist = "[ ";
+            for (NodeList i = first; i != null; i = i.getNext()) {
+                if ((i != last)) {
+                    arraylist += i.getContent() + ", ";
+                } else {
+                    arraylist += last.getContent() + " ]";
+                }
             }
+            return arraylist;
         }
-        return arraylist;
+        return null;
     }
     
     public static void main(String [] args){
         LinkedList<Integer> a = new LinkedList<>();
-//        a.add(0, 1);
-//        a.add(1, 2);
-//        a.add(2, 3);
-//        a.add(3, 4);
-//        a.add(4, 5);
-//        a.add(5, 6);
-//        a.add(6, 7);
-//        a.add(7, 8);
-        a.addLast(1);
-        a.addLast(2);
-        a.addLast(3);
-        a.addLast(4);
-        a.addFirst(5);
-        a.addFirst(6);
-        
+        a.addFirst(25);
+        a.addLast(50);
+        a.addFirst(13);
+        a.addFirst(14);
+        a.add(3,10);
+        a.add(0, 13);
+        a.add(3,24);
+        a.addFirst(11);
+        a.remove(4);
+        a.set(2,15);
+        a.removeLast();
+        a.get(5);
+        System.out.println(a.size());
         System.out.println(a.toString());
+        a.clear();
+        System.out.println(a.size());
+        
+        
         Iterator iterator = a.iterator();
         while(iterator.hasNext()){
             System.out.println(iterator.next());
         }
+        System.out.println(a.size());
+        
     }
-
 }
