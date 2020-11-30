@@ -241,31 +241,4 @@ public class LinkedList<E> implements List<E> {
         return null;
     }
     
-    public static void main(String [] args){
-        LinkedList<Integer> a = new LinkedList<>();
-        a.addFirst(25);
-        a.addLast(50);
-        a.addFirst(13);
-        a.addFirst(14);
-        a.add(3,10);
-        a.add(0, 13);
-        a.add(3,24);
-        a.addFirst(11);
-        a.remove(4);
-        a.set(2,15);
-        a.removeLast();
-        a.get(5);
-        System.out.println(a.size());
-        System.out.println(a.toString());
-        a.clear();
-        System.out.println(a.size());
-        
-        
-        Iterator iterator = a.iterator();
-        while(iterator.hasNext()){
-            System.out.println(iterator.next());
-        }
-        System.out.println(a.size());
-        
-    }
 }
