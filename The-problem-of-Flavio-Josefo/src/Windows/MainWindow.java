@@ -32,6 +32,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 
 /**
@@ -49,7 +50,6 @@ public class MainWindow {
     private Label ldirection;
     private HBox elem;
     private VBox per;
-    private Slider nPlayers;
     static final String STRINGIMAGE = "/Imagens/";
     private final Simulacion simu;
     private Button start, leave;
@@ -82,15 +82,14 @@ public class MainWindow {
         root = new BorderPane();
         root.setBottom(buttons);
         root.setTop(title);
-        
+
         createOp();
         scene = new Scene(root, 800, 800);
         scene.getStylesheets().add("Windows/Viper.css");
-        
+
         eventos(stage);
     }
 
-  
     public Scene getScene() {
         return scene;
     }
@@ -111,6 +110,7 @@ public class MainWindow {
         TextField cantidad_personas = new TextField();
         Button b = new Button("Crear");
         b.setOnMouseClicked((e) -> {
+            rounds.getChildren().clear();
             showPersonas(Integer.parseInt(cantidad_personas.getText()));
 
         });
@@ -118,17 +118,21 @@ public class MainWindow {
         return new VBox(t, cantidad_personas, b);
     }
 
-
     private void showPersonas(int quantity) {
+        int grados =0;
+
         double angle = Math.toRadians(Simulacion.GRADES / quantity);
         for (int i = 0; i < quantity; i++) {
             Person p = new Person(i + 1, angle * i);
             simu.personas.addLast(p);
             ImageView iv = new ImageView(new Image(getClass().getResource(STRINGIMAGE + "imagen1" + ".png").toString()));
+
             iv.setFitHeight(75);
             iv.setFitWidth(75);
             iv.setLayoutX(p.getPosition()[0]);
             iv.setLayoutY(p.getPosition()[1]);
+            iv.setRotate(iv.getRotate() + grados+90);
+            grados += Simulacion.GRADES / quantity;
             rounds.getChildren().addAll(iv);
         }
     }
@@ -149,7 +153,7 @@ public class MainWindow {
         elem.setMinHeight(110);
         elem.setSpacing(60);
         elem.setPadding(new Insets(20, 20, 20, 20));
-        medio.getChildren().addAll(elem,rounds);
+        medio.getChildren().addAll(elem, rounds);
         medio.setAlignment(Pos.CENTER);
         root.setCenter(medio);
         //elem.setStyle("-fx-background-color:#DAC1B7");
