@@ -9,236 +9,231 @@ import java.util.Iterator;
  */
 public class LinkedList<E> implements List<E> {
 
-    private NodeList<E> first;
+    private NodeList<E> header;
     private NodeList<E> last;
-    private int effectiveSize;
+    private int nodeNumber;
 
     public LinkedList() {
-        this.first = null;
+        this.header = null;
         this.last = null;
-        effectiveSize = 0;
+        this.nodeNumber = 0;
     }
 
     @Override
-    public E addFirst(E element) {
-        if (!(element == null)) {
-            NodeList<E> newNode = new NodeList<>(element);
-            if (isEmpty()) {
-                first = newNode;
-                last= newNode;
-                effectiveSize++;
-                return newNode.getContent();
-            } else {
-                newNode.setNext(first);
-                first = newNode;
-                effectiveSize++;
-                return newNode.getContent();
+    public boolean addFirst(E e) {
+        NodeList<E> new1 = new NodeList<>(e);
+        if (e == null) {
+            return false;
+        } else if (this.isEmpty()) {
+            setHeader(new1);
+            setLast(new1);
+            nodeNumber++;
+            return true;
+        } else {
+            new1.setNext(header);
+            this.setHeader(new1);
+            nodeNumber++;
+            return true;
 
-            }
         }
-        return null;
+
     }
 
     @Override
-    public E addLast(E element) {
-        if(!(element == null)){
-            NodeList<E> newNode = new NodeList<>(element);
-            if(isEmpty()){
-                addFirst(element);
-            }else{
-                last.setNext(newNode);
-                last = newNode;
-                effectiveSize++;
-                return newNode.getContent();
-            }
-            
-        }
-        return null;
-    }
+    public boolean addLast(E e) {
+        NodeList new2 = new NodeList(e);
 
-    @Override
-    public E add(int index, E element) {
-        if((index>=0 && index < effectiveSize) || element != null){
-            NodeList<E> newNode = new NodeList<>(element);
-            if(index == 0)
-                return addFirst(element);
-            int cursor=0;
-            for (NodeList<E> i = this.first; i!=null ; i = i.getNext()) {
-                if(cursor == index-1){
-                    newNode.setNext(i.getNext());
-                    i.setNext(newNode);
-                    effectiveSize++;
-                    return newNode.getContent();
-                }else{
-                    cursor++;
-                }
-            }
+        if (e == null) {
+            return false;
+        } else if (this.isEmpty()) {
+            setHeader(new2);
+            setLast(new2);
+            last.setNext(null);
+        } else {
+            last.setNext(new2);
+            this.setLast(new2);
+            last.setNext(null);
         }
-        return null;
+        nodeNumber++;
+        return true;
     }
 
     @Override
     public E removeFirst() {
-        if(!isEmpty()){
-            NodeList<E> removedNode = this.first;
-           if(effectiveSize == 1){
-                this.first = this.last = null;
-                effectiveSize--;
-                return removedNode.getContent();
-            }else{
-                this.first = this.first.getNext();
-                effectiveSize--;
-                removedNode.setNext(null);
-                return removedNode.getContent();
-            }
-           
-        }else
+        E nodeRemoved = header.getContent();
+
+        if (this.isEmpty()) {
             return null;
+
+        } else if (size() == 1) {
+            header = null;
+            last = null;
+            nodeNumber--;
+            return nodeRemoved;
+        } else {
+            setHeader(header.getNext());
+            nodeNumber--;
+        }
+        return nodeRemoved;
     }
 
     @Override
     public E removeLast() {
-        if(!isEmpty()){
-            NodeList<E> removedNode = this.last;
-            if(effectiveSize==1)
-                return removeFirst();
-            else{
-                for (NodeList<E> i = first; i != null; i = i.getNext()) {
-                    if(i.getNext() == last){
-                        i.setNext(null);
-                        last = i;
-                        removedNode.setNext(null);
-                    }
+        if (this.isEmpty()) {
+            return null;
+        } else if (size() == 1) {
+            E nodeRemoved = last.getContent();
+            header = null;
+            last = null;
+            nodeNumber--;
+            return nodeRemoved;
+        } else {
+            E nodeRemoved = last.getContent();
+            NodeList<E> nodeI = header;
+            for (int i = 0; i < size(); i++) {
+                NodeList<E> nodeN = nodeI.getNext();
+                if (nodeN == last) {
+                    setLast(nodeI);
+                    nodeI.setNext(null);
                 }
-                effectiveSize--;
-                return removedNode.getContent();
+                nodeI = nodeN;
             }
+
+            nodeNumber--;
+            return nodeRemoved;
         }
-        return null;
-    }
-
-    @Override
-    public E remove(int index) {
-        if(index>=0 && index < effectiveSize){
-            if(index == 0)
-                return removeFirst();
-            else if(index == effectiveSize-1)
-                return removeLast();
-            else{
-                int cursor=0;
-                for (NodeList<E> i = first; i != null; i = i.getNext()) {
-                    if(cursor == index-1){
-                        NodeList<E> removedNode = i.getNext();
-                        i.setNext(removedNode.getNext());
-                        removedNode.setNext(null);
-                        effectiveSize--;
-                        return removedNode.getContent();
-                    }
-                    else{
-                        cursor++;
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public E get(int index) {
-        if(index >= 0 && index < effectiveSize){
-            if(index==0)
-                return first.getContent();
-            else if(index == effectiveSize-1)
-                return last.getContent();
-            else{
-                int cursor=0;
-                for (NodeList<E> i = first; i != null; i = i.getNext()) {
-                    if(cursor==index){
-                        return i.getContent();
-                    }else
-                        cursor++;
-                }
-            }
-        }return null;
-    }
-
-    @Override
-    public E set(int index, E element) {
-         if((index >= 0 && index <effectiveSize) || element != null){
-            if(index==0){
-                first.setContent(element);
-                return first.getContent();
-            }else if(index == effectiveSize-1){
-                last.setContent(element);
-                return last.getContent();
-            }else{
-                int cursor=0;
-                for (NodeList<E> i = first.getNext(); i != last; i = i.getNext()) {
-                    if(cursor == index){
-                        i.setContent(element);
-                        return i.getContent();
-                    }else{
-                        cursor++;
-                    }
-                }
-            }
-         }
-         return null;
-    }
-
-    @Override
-    public void clear() {
-        this.first = null;
-        this.last = null;
-        effectiveSize = 0;
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return effectiveSize == 0;
     }
 
     @Override
     public int size() {
-        return effectiveSize;
+        return nodeNumber;
     }
 
     @Override
-    public Iterator<E> iterator() {
-        Iterator iterator = new Iterator() {
-            int cursor = 0;
-            E element;
-            NodeList<E> node = first;
-            @Override
-            public boolean hasNext() {
-                return cursor != effectiveSize;
+    public boolean isEmpty() {
+        return header == null;
+    }
+
+    @Override
+    public void clear() {
+        setHeader(null);
+        setLast(null);
+        nodeNumber = 0;
+    }
+
+    @Override
+    public void add(int index, E element) {
+        if (index == 0) {
+            addFirst(element);
+        } else {
+            NodeList nodeIterator = header;
+            for (int i = 0; i < index - 1; i++) {
+                nodeIterator = nodeIterator.getNext();
+            }
+            NodeList bNode = nodeIterator;
+            NodeList afterNode = bNode.getNext();
+            NodeList nodeNew = new NodeList<>(element);
+            bNode.setNext(nodeNew);
+            nodeNew.setNext(afterNode);
+            nodeNumber++;
+
+        }
+    }
+
+    @Override
+    public E remove(int index) {
+        if (index > this.size() - 1) {
+            return null;
+
+        } else {
+            if (index == 0) {
+
+                return removeFirst();
+
+            } else if (index == this.size() - 1) {
+                return removeLast();
+            } else {
+                NodeList<E> nodeConnect = null;
+                int p = 0;
+                for (NodeList<E> i = header; i != null; i = i.getNext()) {
+                    if (p + 1 == index) {
+                        nodeConnect = i.getNext().getNext();
+                        i.setNext(nodeConnect);
+
+                    }
+                    p++;
+                }
+                nodeNumber--;
+                if (nodeConnect != null) {
+                    return nodeConnect.getContent();
+                } else {
+                    return null;
+                }
             }
 
-            @Override
-            public E next() {
-                element = node.getContent();
-                node = node.getNext();
-                cursor++;
-                return element;
-            }
-        };
-        return iterator;
+        }
+
+    }
+
+    @Override
+    public E get(int index) {
+        NodeList<E> nodeI = header;
+        for (int i = 0; i < index - 1; i++) {
+            nodeI = nodeI.getNext();
+        }
+        return nodeI.getContent();
     }
 
     @Override
     public String toString() {
-        if(!isEmpty()){
-            String arraylist = "[ ";
-            for (NodeList i = first; i != null; i = i.getNext()) {
-                if ((i != last)) {
-                    arraylist += i.getContent() + ", ";
-                } else {
-                    arraylist += last.getContent() + " ]";
-                }
+        StringBuilder builder = new StringBuilder();
+        builder.append("[");
+        NodeList nodeItera = header;
+        for (int i = 0; i < nodeNumber; i++) {
+            if (i + 1 == nodeNumber) {
+                builder.append(nodeItera.getContent());
+            } else {
+                builder.append(nodeItera.getContent() + ",");
+                nodeItera = nodeItera.getNext();
             }
-            return arraylist;
         }
-        return null;
+        builder.substring(0, builder.length() - 1);
+        builder.append("]");
+        return builder.toString();
+
     }
-    
+
+    @Override
+    public boolean set(int index, E element) {
+        NodeList<E> nodeI = header;
+        for (int i = 0; i < index - 1; i++) {
+            nodeI = nodeI.getNext();
+        }
+        nodeI.setContent(element);
+        return true;
+    }
+
+    public NodeList<E> getHeader() {
+        return header;
+    }
+
+    public void setHeader(NodeList<E> header) {
+        this.header = header;
+    }
+
+    public NodeList<E> getLast() {
+        return last;
+    }
+
+    public void setLast(NodeList<E> last) {
+        this.last = last;
+    }
+
+    public int getNodeNumber() {
+        return nodeNumber;
+    }
+
+    public void setNodeNumber(int nodeNumber) {
+        this.nodeNumber = nodeNumber;
+    }
 }
