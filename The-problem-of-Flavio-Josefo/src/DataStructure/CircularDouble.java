@@ -152,6 +152,44 @@ public class CircularDouble<E> implements List<E> {
         return null;
     }
 
+    public NodeListDouble<E> buscar(int index) {
+
+        if (isEmpty() || index < 0 || index >= realSize) {
+            return null;
+        }
+        NodeListDouble<E> traveller = header;
+        if (header == last) {
+            header = last = null;
+        } else if (index == 0) {
+            NodeListDouble<E> temp = header;
+            header = header.getNext();
+            temp.setNext(null);
+            realSize--;
+            return temp;
+        } else if (index == realSize - 1) {
+            NodeListDouble<E> temp2 = last;
+            last = last.getPrevious();
+            last.setNext(null);
+            temp2.setPrevious(null);
+            realSize--;
+            return temp2;
+        } else {
+            for (int i = 0; i < realSize; i++) {
+                if (i + 1 == index) {
+                    NodeListDouble<E> noWanted = traveller.getNext();
+                    traveller.setNext(noWanted.getNext());
+                    noWanted.getNext().setPrevious(traveller);
+                    noWanted.setNext(null);
+                    noWanted.setPrevious(null);
+                    realSize--;
+                    return noWanted;
+                }
+                traveller = traveller.getNext();
+            }
+        }
+        return null;
+    }
+
     private NodeListDouble<E> nodeIndexForward(int index) {
         if (isEmpty()) {
             return new NodeListDouble<>(null);
@@ -172,7 +210,7 @@ public class CircularDouble<E> implements List<E> {
         NodeListDouble<E> node = last;
         int i = this.realSize - 1;
         while (i > index) {
-            node = node.getPrevious();
+            node = node.previous;
             i--;
         }
         return node;
@@ -237,4 +275,51 @@ public class CircularDouble<E> implements List<E> {
     public void setSize(int size) {
         this.realSize = size;
     }
+
+    public boolean remove(E element) {
+
+        NodeListDouble<E> actual = header;
+        NodeListDouble<E> anterior = last;
+        boolean eliminado = false;
+
+//        if (!isEmpty()) {
+//            if (header == last && header.content == element) {
+//                header = last = null;
+//            } else {
+//                if (header.content == element) {
+//                    header.next.previous = last;
+//                    last.next = header.next;
+//                    header = header.next;
+//                } else {
+//                    if (last.content == element) {
+//                        last.previous.next = header;
+//
+//                    }
+//
+//                }
+//            }
+//        }
+        do {
+            if (actual.getContent() == element) {
+                if (actual == header) {
+                    header = header.getNext();
+                    last.setNext(header);
+                    header.setPrevious(last);
+                } else if (actual == last) {
+                    last = anterior;
+                    header.setPrevious(last);
+                    last.setNext(header);
+                } else {
+                    anterior.setNext(actual.getNext());
+                    actual.getNext().setPrevious(anterior);
+                }
+                eliminado = true;
+            }
+            anterior = actual;
+            actual = actual.getNext();
+        } while (actual != header && eliminado == false);
+        return eliminado;
+
+    }
+
 }

@@ -14,7 +14,7 @@ import static java.lang.Math.sin;
  */
 public class Person {
 
-    private final String url;
+    private  String url;
     private double angle;
     private double[] posicion;
 
@@ -45,5 +45,11 @@ public class Person {
     public boolean isOcupied() {
         return true;
     }
+
+    public String getUrl() {
+        return url;
+    }
+
+   
 
 }

@@ -5,14 +5,17 @@
  */
 package Windows;
 
+import DataStructure.NodeListDouble;
 import Objects.Person;
 import Objects.Simulacion;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -59,6 +62,8 @@ public class MainWindow {
     private Label title;
     public ImageView imagen;
     private Pane rounds;
+    private boolean buttonStart;
+    private TextField cantidad_personas;
 
     public MainWindow(Stage stage) {
         medio = new VBox();
@@ -69,10 +74,6 @@ public class MainWindow {
         leave = new Button("LEAVE");
         leave.setPrefSize(180, 50);
 
-        title = new Label("EL PROBLEMA DE FLAVIO JOSEFO");
-        title.setId("title-titulo");
-        title.setAlignment(Pos.CENTER);
-
         // imagen = mostrarImagen("Imagens", "main2.png", 400, 400);
         buttons = new HBox();
         buttons.getChildren().addAll(start, leave);
@@ -81,10 +82,9 @@ public class MainWindow {
 
         root = new BorderPane();
         root.setBottom(buttons);
-        root.setTop(title);
 
         createOp();
-        scene = new Scene(root, 800, 800);
+        scene = new Scene(root, 1000, 1000);
         scene.getStylesheets().add("Windows/Viper.css");
 
         eventos(stage);
@@ -98,16 +98,16 @@ public class MainWindow {
         leave.setOnAction(e -> {
             stage.close();
         });
-        start.setOnAction(e -> {
-            SimulationWindow v = new SimulationWindow(stage);
-            stage.setScene(v.getScene());
+        start.setOnMouseClicked(e -> {
+            matar(Integer.parseInt(cantidad_personas.getText()), 7);
+
         });
 
     }
 
     private VBox createPersonas() {
         Label t = new Label("Numero de Personas: ");
-        TextField cantidad_personas = new TextField();
+        cantidad_personas = new TextField();
         Button b = new Button("Crear");
         b.setOnMouseClicked((e) -> {
             rounds.getChildren().clear();
@@ -119,25 +119,30 @@ public class MainWindow {
     }
 
     private void showPersonas(int quantity) {
-        int grados =0;
+        int grados = 0;
 
         double angle = Math.toRadians(Simulacion.GRADES / quantity);
         for (int i = 0; i < quantity; i++) {
             Person p = new Person(i + 1, angle * i);
             simu.personas.addLast(p);
             ImageView iv = new ImageView(new Image(getClass().getResource(STRINGIMAGE + "imagen1" + ".png").toString()));
-
             iv.setFitHeight(75);
             iv.setFitWidth(75);
             iv.setLayoutX(p.getPosition()[0]);
             iv.setLayoutY(p.getPosition()[1]);
-            iv.setRotate(iv.getRotate() + grados+90);
+            iv.setRotate(iv.getRotate() + grados + 90);
             grados += Simulacion.GRADES / quantity;
+
             rounds.getChildren().addAll(iv);
         }
     }
 
     private void createOp() {
+
+        title = new Label("EL PROBLEMA DE FLAVIO JOSEFO");
+        title.setId("title-titulo");
+        title.setAlignment(Pos.CENTER);
+        VBox top = new VBox();
         rounds = new Pane();
         rounds.setMaxSize(650, 450);
         rounds.setMinSize(650, 450);
@@ -153,7 +158,10 @@ public class MainWindow {
         elem.setMinHeight(110);
         elem.setSpacing(60);
         elem.setPadding(new Insets(20, 20, 20, 20));
-        medio.getChildren().addAll(elem, rounds);
+        top.getChildren().addAll(title, elem);
+        root.setTop(top);
+
+        medio.getChildren().add(rounds);
         medio.setAlignment(Pos.CENTER);
         root.setCenter(medio);
         //elem.setStyle("-fx-background-color:#DAC1B7");
@@ -173,5 +181,38 @@ public class MainWindow {
         ccw = new HBox(bccw);
         ccw.setSpacing(20);
         return new VBox(ldirection, cw, ccw);
+    }
+
+    class ThreadGame implements Runnable {
+
+        @Override
+        @SuppressWarnings("SleepWhileInLoop")
+        public void run() {
+            while (buttonStart) {
+
+                break;
+
+            }
+
+        }
+    }
+    private void matar(int numero_total,int comienzo){
+        NodeListDouble<Person> current = simu.personas.buscar(comienzo);
+        while(numero_total !=1){
+            
+            current.getNext();
+            Person p =current.getContent();
+            ImageView iv = new ImageView(new Image(getClass().getResource(STRINGIMAGE + "muerto1" + ".png").toString()));
+            iv.setFitHeight(75);
+            iv.setFitWidth(75);
+            iv.setLayoutX(p.getPosition()[0]);
+            iv.setLayoutY(p.getPosition()[1]);
+            rounds.getChildren().addAll(iv);
+            
+            
+            numero_total--;
+            
+        }
+        
     }
 }

@@ -27,21 +27,19 @@ import javafx.stage.Stage;
  * @author Jeanca
  */
 public class SimulationWindow {
+
     private Button back;
-    private VBox root ;
-     private BorderPane borderPane;
-     private Scene scene;
-     public SimulationWindow(Stage stage){
+    private BorderPane root;
+    private Scene scene;
+
+    public SimulationWindow(Stage stage) {
         back = new Button("Back");
-        root=new VBox();
-        root.getChildren().addAll(back);
-        root.setAlignment(Pos.CENTER);
-        root.setSpacing(8.0);
+        root = new BorderPane();
         
-        borderPane = new BorderPane();
-        borderPane.setCenter(root);
-        
-        scene=new Scene(borderPane,800, 800);
+        root.setBottom(back);
+       root.setAlignment(back, Pos.CENTER);
+
+        scene = new Scene(root, 800, 800);
         scene.getStylesheets().add("Windows/Viper.css");
         eventos(stage);
     }
@@ -50,14 +48,13 @@ public class SimulationWindow {
         return scene;
     }
 
-     
     private void eventos(Stage stage) {
-        back.setOnAction(e ->{
+        back.setOnAction(e -> {
             MainWindow v = new MainWindow(stage);
             stage.setScene(v.getScene());
         });
     }
     
+    
 
-     
 }

@@ -59,4 +59,8 @@ public class Simulacion {
     public static void setWay(boolean way) {
         Simulacion.way = way;
     }
+    
+    public void matarPersona(){
+        
+    }
 }

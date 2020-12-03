@@ -5,10 +5,10 @@ package DataStructure;
  * @author oscarlucas7
  */
 public class NodeListDouble<E> {
-   
-    private E content;
-    private NodeListDouble<E> next;
-    private NodeListDouble<E> previous;
+
+    E content;
+    NodeListDouble<E> next;
+    NodeListDouble<E> previous;
 
     public NodeListDouble(E content) {
         this.content = content;
@@ -70,7 +70,5 @@ public class NodeListDouble<E> {
     public void setPrevious(NodeListDouble<E> previous) {
         this.previous = previous;
     }
-    
-    
-    
+
 }
