@@ -46,31 +46,37 @@ public class MainWindow {
 
     private Label posicion_comienzo;
     private TextField posicionInicial;
+    private Button pausar;
+    private Button reanudar;
 
     private StackPane PanelJuego;
     private Button left, right, start, restart;
     private Pane pane;
-    private Button izquiera;
-    private Button derecha;
-    private Button restar;
     private Scene scene;
     private Button crear;
     private Button mirar;
     String direccion;
+    public boolean suspender;
 
     private BorderPane root;
     private VBox rightSide;
     private HBox buttons;
+    
+    private VBox buttons2;
+    private VBox direc;
 
     public Image imagen_soldado_dorado;
     public Image imagen_soldado_azul;
     public Image imagen_soldado_muerto;
 
     public MainWindow(Stage stage) {
+        HBox pyr = new HBox();
 
+        HBox syr = new HBox();
         imagen_soldado_dorado = new Image("\\Imagens\\dorado.png");
         imagen_soldado_muerto = new Image("\\Imagens\\muerto1.png");
-
+        pausar = new Button("Pausar");
+        reanudar = new Button("Reanudar");
         mirar = new Button("Mirar");
         imagen_soldado_azul = new Image("\\Imagens\\imagen1.png");
         VBox arriba = new VBox();
@@ -87,33 +93,55 @@ public class MainWindow {
         restart = new Button("Reiniciar");
 
         buttons = new HBox();
-        buttons.getChildren().addAll(left,right);
+        buttons.getChildren().addAll(left, right);
         buttons.setAlignment(Pos.CENTER);
         buttons.setSpacing(10.0);
 
+        buttons2 = new VBox();
+        buttons2.getChildren().addAll(start,restart);
+        buttons2.setAlignment(Pos.CENTER);
+        buttons2.setSpacing(10.0);
+        
         medio.getChildren().addAll(posicion_comienzo, posicionInicial, mirar);
         medio.setAlignment(Pos.CENTER);
-        medio.setSpacing(10);
+        medio.setSpacing(20.0);
+
+        syr.getChildren().addAll(start, restart);
+        syr.setAlignment(Pos.CENTER);
+        syr.setSpacing(15);
+        pyr.getChildren().addAll(pausar, reanudar);
+        pyr.setAlignment(Pos.CENTER);
+        pyr.setSpacing(15);
 
         rightSide = new VBox();
         arriba.getChildren().addAll(cant_personas, numeroPersonas, crear);
         arriba.setAlignment(Pos.CENTER);
-        arriba.setSpacing(25);
-        rightSide.getChildren().addAll(arriba, medio,
-                new Label("Direccion"), buttons, start, restart
-        );
-        rightSide.setAlignment(Pos.CENTER);
-        rightSide.setSpacing(70.0);
+        arriba.setSpacing(20);
+        
+        direc = new VBox();
+        direc.getChildren().addAll( new Label("Direccion"), buttons);
+        direc.setAlignment(Pos.CENTER);
+        direc.setSpacing(20.0);
+        
+   
         pane = new StackPane();
+        
+        rightSide = new VBox();
+        rightSide.getChildren().addAll(arriba,medio,direc, buttons2,syr,pyr);
+        rightSide.setAlignment(Pos.CENTER);
+        rightSide.setSpacing(60.0);
+        rightSide.setId("derecho");
         eventos(stage);
 
         pane.setStyle("-fx-background-color:White");
-
+        
+        
+         pane.setId("panel");
         root = new BorderPane();
         root.setCenter(pane);
         root.setRight(rightSide);
 
-        scene = new Scene(root, 800, 800);
+        scene = new Scene(root, 1000, 800);
         scene.getStylesheets().add("Windows/Viper.css");
 
     }
@@ -178,6 +206,14 @@ public class MainWindow {
             left.setDisable(false);
         });
 
+        pausar.setOnAction(e -> {
+            suspender = true;
+        });
+
+        reanudar.setOnAction(e -> {
+            suspender = false;
+        });
+
     }
 
     public Scene getScene() {
@@ -202,6 +238,11 @@ public class MainWindow {
                         personasVivas -= 1;
                     }
                     Thread.sleep(velocidad);
+                    synchronized (this) {
+                        while (suspender) {
+                            wait(500);
+                        }
+                    }
 
                     if (personasVivas == 0) {
                         break;
@@ -227,6 +268,11 @@ public class MainWindow {
                         personasVivas -= 1;
                     }
                     Thread.sleep(velocidad);
+                    synchronized (this) {
+                        while (suspender) {
+                            wait(500);
+                        }
+                    }
 
                     if (personasVivas == 0) {
                         break;
