@@ -55,6 +55,7 @@ public class MainWindow {
     private Button restar;
     private Scene scene;
     private Button crear;
+    private Button mirar;
     String direccion;
 
     private BorderPane root;
@@ -66,8 +67,14 @@ public class MainWindow {
     public Image imagen_soldado_muerto;
 
     public MainWindow(Stage stage) {
+
+        imagen_soldado_dorado = new Image("\\Imagens\\dorado.png");
+        imagen_soldado_muerto = new Image("\\Imagens\\muerto1.png");
+
+        mirar = new Button("Mirar");
         imagen_soldado_azul = new Image("\\Imagens\\imagen1.png");
         VBox arriba = new VBox();
+        VBox medio = new VBox();
         crear = new Button("Crear");
         posicion_comienzo = new Label("INCIAL");
         cant_personas = new Label("Cantidad personas");
@@ -84,11 +91,15 @@ public class MainWindow {
         buttons.setAlignment(Pos.CENTER);
         buttons.setSpacing(10.0);
 
+        medio.getChildren().addAll(posicion_comienzo, posicionInicial, mirar);
+        medio.setAlignment(Pos.CENTER);
+        medio.setSpacing(10);
+
         rightSide = new VBox();
         arriba.getChildren().addAll(cant_personas, numeroPersonas, crear);
         arriba.setAlignment(Pos.CENTER);
         arriba.setSpacing(25);
-        rightSide.getChildren().addAll(arriba, posicion_comienzo, posicionInicial,
+        rightSide.getChildren().addAll(arriba, medio,
                 new Label("Direccion"), buttons, start, restart
         );
         rightSide.setAlignment(Pos.CENTER);
@@ -109,19 +120,25 @@ public class MainWindow {
 
     private void eventos(Stage stage) {
 
-        crear.setOnAction(e -> {
-            int p = Integer.parseInt(numeroPersonas.getText());
+        mirar.setOnAction(e -> {
+            pane.getChildren().clear();
+            comienzo = Integer.parseInt(posicionInicial.getText());
+            personas = new CircularDouble<Person>();
 
-            for (int i = 0; i < p; i++) {
-                ImageView actual = new ImageView(imagen_soldado_azul);
-                actual.setFitWidth(75);
-                actual.setFitHeight(75);
-                actual.setPreserveRatio(false);
-                actual.setTranslateX(250 * Math.cos((((360 / (double) p) * Math.PI) / 180) * i));
-                actual.setTranslateY(250 * Math.sin((((360 / (double) p) * Math.PI) / 180) * i));
-                actual.setRotate((360 / (double) p) * i + 90);
-                pane.getChildren().add(actual);
-            }
+            llenarJuego(personas, cantidadPersonas);
+
+        });
+
+        crear.setOnAction(e -> {
+            comienzo = 1;
+
+            int p = Integer.parseInt(numeroPersonas.getText());
+            cantidadPersonas = p;
+
+            personas = new CircularDouble<Person>();
+
+            llenarJuego(personas, cantidadPersonas);
+
         });
         start.setOnAction(e -> {
             pane.getChildren().clear();
@@ -132,19 +149,31 @@ public class MainWindow {
             hilo.start();
 
         });
-        
-        left.setOnAction(e ->{
+
+        left.setOnAction(e -> {
             left.setDisable(true);
             String d = left.getText();
-            direccion  = d;
+            direccion = d;
+            right.setDisable(false);
+
         });
-        
-        right.setOnAction(e ->{
+
+        right.setOnAction(e -> {
+
             right.setDisable(true);
             String d = right.getText();
-            direccion  = d;
+            direccion = d;
+            left.setDisable(false);
         });
-     
+
+        restart.setOnAction(e -> {
+            pane.getChildren().clear();
+            numeroPersonas.clear();
+            personas.clear();
+            posicionInicial.clear();
+            right.setDisable(false);
+            left.setDisable(false);
+        });
 
     }
 
@@ -232,20 +261,13 @@ public class MainWindow {
     public void initialize(int i) {
         cantidadPersonas = i;
         velocidad = 500;
-        
-        
-        
-        imagen_soldado_dorado = new Image("\\Imagens\\imagen1.png");
-        imagen_soldado_muerto = new Image("\\Imagens\\muerto1.png");
 
-        comienzo = 1;
         desfase = 2;
         personas = new CircularDouble<Person>();
         llenarJuego(personas, cantidadPersonas);
 
         cant_personas.setText("Cantidad de personas: " + cantidadPersonas);
         posicion_comienzo.setText("Posición de la persona que comienza: " + (comienzo + 1));
-
 
         hiloControl = new Runnable() {
             @Override
