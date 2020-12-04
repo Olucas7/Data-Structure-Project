@@ -76,7 +76,7 @@ public class MainWindow {
         VBox arriba = new VBox();
         VBox medio = new VBox();
         crear = new Button("Crear");
-        posicion_comienzo = new Label("INCIAL");
+        posicion_comienzo = new Label("Posición de la persona que comienza: ");
         cant_personas = new Label("Cantidad personas");
         numeroPersonas = new TextField();
         posicionInicial = new TextField();
@@ -87,7 +87,7 @@ public class MainWindow {
         restart = new Button("Reiniciar");
 
         buttons = new HBox();
-        buttons.getChildren().addAll(right, left);
+        buttons.getChildren().addAll(left,right);
         buttons.setAlignment(Pos.CENTER);
         buttons.setSpacing(10.0);
 
@@ -126,10 +126,12 @@ public class MainWindow {
             personas = new CircularDouble<Person>();
 
             llenarJuego(personas, cantidadPersonas);
+            posicion_comienzo.setText("Posición de la persona que comienza: " + (comienzo + 1));
 
         });
 
         crear.setOnAction(e -> {
+            pane.getChildren().clear();
             comienzo = 1;
 
             int p = Integer.parseInt(numeroPersonas.getText());
@@ -138,6 +140,7 @@ public class MainWindow {
             personas = new CircularDouble<Person>();
 
             llenarJuego(personas, cantidadPersonas);
+            personas.clear();
 
         });
         start.setOnAction(e -> {
