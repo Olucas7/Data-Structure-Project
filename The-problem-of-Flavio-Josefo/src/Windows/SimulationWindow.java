@@ -27,34 +27,34 @@ import javafx.stage.Stage;
  * @author Jeanca
  */
 public class SimulationWindow {
-
-    private Button back;
-    private BorderPane root;
-    private Scene scene;
-
-    public SimulationWindow(Stage stage) {
-        back = new Button("Back");
-        root = new BorderPane();
-        
-        root.setBottom(back);
-       root.setAlignment(back, Pos.CENTER);
-
-        scene = new Scene(root, 800, 800);
-        scene.getStylesheets().add("Windows/Viper.css");
-        eventos(stage);
-    }
-
-    public Scene getScene() {
-        return scene;
-    }
-
-    private void eventos(Stage stage) {
-        back.setOnAction(e -> {
-            MainWindow v = new MainWindow(stage);
-            stage.setScene(v.getScene());
-        });
-    }
-    
-    
+//
+//    private Button back;
+//    private BorderPane root;
+//    private Scene scene;
+//
+//    public SimulationWindow(Stage stage) {
+//        back = new Button("Back");
+//        root = new BorderPane();
+//        
+//        root.setBottom(back);
+//       root.setAlignment(back, Pos.CENTER);
+//
+//        scene = new Scene(root, 800, 800);
+//        scene.getStylesheets().add("Windows/Viper.css");
+//        eventos(stage);
+//    }
+//
+//    public Scene getScene() {
+//        return scene;
+//    }
+//
+//    private void eventos(Stage stage) {
+//        back.setOnAction(e -> {
+//            MainWindow v = new MainWindow(stage);
+//            stage.setScene(v.getScene());
+//        });
+//    }
+//    
+//    
 
 }

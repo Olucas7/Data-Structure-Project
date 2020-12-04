@@ -5,37 +5,23 @@
  */
 package Windows;
 
-import DataStructure.NodeListDouble;
+import DataStructure.CircularDouble;
 import Objects.Person;
-import Objects.Simulacion;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javafx.application.Platform;
-import javafx.beans.value.ObservableValue;
-import javafx.geometry.Insets;
+import java.net.URL;
+import java.util.ListIterator;
+import java.util.ResourceBundle;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
-import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 
 /**
@@ -44,175 +30,230 @@ import javafx.stage.Stage;
  */
 public class MainWindow {
 
-    private VBox medio;
-    private VBox direction;
-    private HBox cw;
-    private HBox ccw;
-    private RadioButton bcw;
-    private RadioButton bccw;
-    private Label ldirection;
-    private HBox elem;
-    private VBox per;
-    static final String STRINGIMAGE = "/Imagens/";
-    private final Simulacion simu;
-    private Button start, leave;
-    private BorderPane root;
-    private HBox buttons;
+    public int comienzo;
+    public int velocidad;
+    public int desfase = 2;
+    public CircularDouble<Person> personas;
+    public int cantidadPersonas;
+    public int personasVivas;
+    public static Thread hilo;
+    public static Runnable hiloControl;
+    public ListIterator<Person> iter;
+
+    //GUI
+    private Label cant_personas;
+    private TextField numeroPersonas;
+
+    private Label posicion_comienzo;
+    private TextField posicionInicial;
+
+    private StackPane PanelJuego;
+    private Button left, right, start, restart;
+    private Pane pane;
+    private Button izquiera;
+    private Button derecha;
+    private Button restar;
     private Scene scene;
-    private Label title;
-    public ImageView imagen;
-    private Pane rounds;
-    private boolean buttonStart;
-    private TextField cantidad_personas;
+    private Button crear;
+    String direccion;
+
+    private BorderPane root;
+    private VBox rightSide;
+    private HBox buttons;
+
+    public Image imagen_soldado_dorado;
+    public Image imagen_soldado_azul;
+    public Image imagen_soldado_muerto;
 
     public MainWindow(Stage stage) {
-        medio = new VBox();
-        elem = new HBox();
-        simu = new Simulacion();
-        start = new Button("START");
-        start.setPrefSize(180, 50);
-        leave = new Button("LEAVE");
-        leave.setPrefSize(180, 50);
+        imagen_soldado_azul = new Image("\\Imagens\\imagen1.png");
+        VBox arriba = new VBox();
+        crear = new Button("Crear");
+        posicion_comienzo = new Label("INCIAL");
+        cant_personas = new Label("Cantidad personas");
+        numeroPersonas = new TextField();
+        posicionInicial = new TextField();
 
-        // imagen = mostrarImagen("Imagens", "main2.png", 400, 400);
+        left = new Button("Izquierda");
+        right = new Button("Derecha");
+        start = new Button("Iniciar");
+        restart = new Button("Reiniciar");
+
         buttons = new HBox();
-        buttons.getChildren().addAll(start, leave);
+        buttons.getChildren().addAll(right, left);
         buttons.setAlignment(Pos.CENTER);
-        buttons.setSpacing(40.0);
+        buttons.setSpacing(10.0);
+
+        rightSide = new VBox();
+        arriba.getChildren().addAll(cant_personas, numeroPersonas, crear);
+        arriba.setAlignment(Pos.CENTER);
+        arriba.setSpacing(25);
+        rightSide.getChildren().addAll(arriba, posicion_comienzo, posicionInicial,
+                new Label("Direccion"), buttons, start, restart
+        );
+        rightSide.setAlignment(Pos.CENTER);
+        rightSide.setSpacing(70.0);
+        pane = new StackPane();
+        eventos(stage);
+
+        pane.setStyle("-fx-background-color:White");
 
         root = new BorderPane();
-        root.setBottom(buttons);
+        root.setCenter(pane);
+        root.setRight(rightSide);
 
-        createOp();
-        scene = new Scene(root, 1000, 1000);
+        scene = new Scene(root, 800, 800);
         scene.getStylesheets().add("Windows/Viper.css");
 
-        eventos(stage);
+    }
+
+    private void eventos(Stage stage) {
+
+        crear.setOnAction(e -> {
+            int p = Integer.parseInt(numeroPersonas.getText());
+
+            for (int i = 0; i < p; i++) {
+                ImageView actual = new ImageView(imagen_soldado_azul);
+                actual.setFitWidth(75);
+                actual.setFitHeight(75);
+                actual.setPreserveRatio(false);
+                actual.setTranslateX(250 * Math.cos((((360 / (double) p) * Math.PI) / 180) * i));
+                actual.setTranslateY(250 * Math.sin((((360 / (double) p) * Math.PI) / 180) * i));
+                actual.setRotate((360 / (double) p) * i + 90);
+                pane.getChildren().add(actual);
+            }
+        });
+        start.setOnAction(e -> {
+            pane.getChildren().clear();
+            int p = Integer.parseInt(numeroPersonas.getText());
+            initialize(p);
+
+            iter = personas.IterarNode(comienzo);
+            hilo.start();
+
+        });
+        
+        left.setOnAction(e ->{
+            left.setDisable(true);
+            String d = left.getText();
+            direccion  = d;
+        });
+        
+        right.setOnAction(e ->{
+            right.setDisable(true);
+            String d = right.getText();
+            direccion  = d;
+        });
+     
+
     }
 
     public Scene getScene() {
         return scene;
     }
 
-    private void eventos(Stage stage) {
-        leave.setOnAction(e -> {
-            stage.close();
-        });
-        start.setOnMouseClicked(e -> {
-            matar(Integer.parseInt(cantidad_personas.getText()), 7);
+    private void comenzarEnDireccionIndicada(ListIterator<Person> iter, String direccion) {
+        personasVivas = cantidadPersonas - 1;
+        if (direccion.equals("Izquierda")) {
+            try {
+                while (iter.hasNext()) {
+                    Person soldadoParticipante = iter.next();
+                    Person muerto = null;
+                    if (soldadoParticipante.isAlive()) {
+                        int desfaseTemp = desfase - 1;
+                        while (desfaseTemp > 0) {
+                            muerto = iter.next();
+                            desfaseTemp--;
+                        }
+                        personas.remove(muerto);
+                        muerto.setPersona_imagen(imagen_soldado_muerto);
+                        personasVivas -= 1;
+                    }
+                    Thread.sleep(velocidad);
 
-        });
+                    if (personasVivas == 0) {
+                        break;
+                    }
+                }
+            } catch (Exception e) {
+                System.err.print(e);
+            }
 
-    }
+        } else if (direccion.equals("Derecha")) {
+            try {
+                while (iter.hasPrevious()) {
+                    Person soldadoParticipante = iter.previous();
+                    Person muerto = null;
+                    if (soldadoParticipante.isAlive()) {
+                        int desfaseTemp = desfase - 1;
+                        while (desfaseTemp > 0) {
+                            muerto = iter.previous();
+                            desfaseTemp--;
+                        }
+                        personas.remove(muerto);
+                        muerto.setPersona_imagen(imagen_soldado_muerto);
+                        personasVivas -= 1;
+                    }
+                    Thread.sleep(velocidad);
 
-    private VBox createPersonas() {
-        Label t = new Label("Numero de Personas: ");
-        cantidad_personas = new TextField();
-        Button b = new Button("Crear");
-        b.setOnMouseClicked((e) -> {
-            rounds.getChildren().clear();
-            showPersonas(Integer.parseInt(cantidad_personas.getText()));
-
-        });
-
-        return new VBox(t, cantidad_personas, b);
-    }
-
-    private void showPersonas(int quantity) {
-        int grados = 0;
-
-        double angle = Math.toRadians(Simulacion.GRADES / quantity);
-        for (int i = 0; i < quantity; i++) {
-            Person p = new Person(i + 1, angle * i);
-            simu.personas.addLast(p);
-            ImageView iv = new ImageView(new Image(getClass().getResource(STRINGIMAGE + "imagen1" + ".png").toString()));
-            iv.setFitHeight(75);
-            iv.setFitWidth(75);
-            iv.setLayoutX(p.getPosition()[0]);
-            iv.setLayoutY(p.getPosition()[1]);
-            iv.setRotate(iv.getRotate() + grados + 90);
-            grados += Simulacion.GRADES / quantity;
-
-            rounds.getChildren().addAll(iv);
-        }
-    }
-
-    private void createOp() {
-
-        title = new Label("EL PROBLEMA DE FLAVIO JOSEFO");
-        title.setId("title-titulo");
-        title.setAlignment(Pos.CENTER);
-        VBox top = new VBox();
-        rounds = new Pane();
-        rounds.setMaxSize(650, 450);
-        rounds.setMinSize(650, 450);
-        rounds.setStyle("-fx-background-color:White");
-        per = createPersonas();
-        per.setSpacing(10);
-
-        direction = createDirections();
-        direction.setSpacing(10);
-
-        elem.getChildren().addAll(per, direction);
-        elem.setAlignment(Pos.CENTER);
-        elem.setMinHeight(110);
-        elem.setSpacing(60);
-        elem.setPadding(new Insets(20, 20, 20, 20));
-        top.getChildren().addAll(title, elem);
-        root.setTop(top);
-
-        medio.getChildren().add(rounds);
-        medio.setAlignment(Pos.CENTER);
-        root.setCenter(medio);
-        //elem.setStyle("-fx-background-color:#DAC1B7");
-    }
-
-    private VBox createDirections() {
-        ldirection = new Label("Sentido: ");
-        ToggleGroup group = new ToggleGroup();
-        bcw = new RadioButton("Horario");
-        bcw.setSelected(true);
-        bcw.setToggleGroup(group);
-        bccw = new RadioButton("Antihorario");
-        bccw.setToggleGroup(group);
-
-        cw = new HBox(bcw);
-        cw.setSpacing(63);
-        ccw = new HBox(bccw);
-        ccw.setSpacing(20);
-        return new VBox(ldirection, cw, ccw);
-    }
-
-    class ThreadGame implements Runnable {
-
-        @Override
-        @SuppressWarnings("SleepWhileInLoop")
-        public void run() {
-            while (buttonStart) {
-
-                break;
-
+                    if (personasVivas == 0) {
+                        break;
+                    }
+                }
+            } catch (Exception ex) {
+                System.err.println(ex);
             }
 
         }
     }
-    private void matar(int numero_total,int comienzo){
-        NodeListDouble<Person> current = simu.personas.buscar(comienzo);
-        while(numero_total !=1){
-            
-            current.getNext();
-            Person p =current.getContent();
-            ImageView iv = new ImageView(new Image(getClass().getResource(STRINGIMAGE + "muerto1" + ".png").toString()));
-            iv.setFitHeight(75);
-            iv.setFitWidth(75);
-            iv.setLayoutX(p.getPosition()[0]);
-            iv.setLayoutY(p.getPosition()[1]);
-            rounds.getChildren().addAll(iv);
-            
-            
-            numero_total--;
-            
+
+    private void llenarJuego(CircularDouble<Person> personas, int valor) {
+        for (int i = 0; i < valor; i++) {
+            ImageView actual = new ImageView(imagen_soldado_azul);
+            actual.setFitWidth(75);
+            actual.setFitHeight(75);
+            actual.setPreserveRatio(false);
+            actual.setTranslateX(250 * Math.cos((((360 / (double) valor) * Math.PI) / 180) * i));
+            actual.setTranslateY(250 * Math.sin((((360 / (double) valor) * Math.PI) / 180) * i));
+            if (i == comienzo) {
+                actual.setImage(imagen_soldado_dorado);
+            }
+            actual.setRotate((360 / (double) valor) * i + 90);
+            Person p = new Person(actual, true);
+            personas.addLast(p);
         }
-        
+
+        ListIterator<Person> iter = personas.listIterator();
+        while (iter.hasNext()) {
+            pane.getChildren().add(iter.next().getPersona_imagen());
+        }
     }
+
+    public void initialize(int i) {
+        cantidadPersonas = i;
+        velocidad = 500;
+        
+        
+        
+        imagen_soldado_dorado = new Image("\\Imagens\\imagen1.png");
+        imagen_soldado_muerto = new Image("\\Imagens\\muerto1.png");
+
+        comienzo = 1;
+        desfase = 2;
+        personas = new CircularDouble<Person>();
+        llenarJuego(personas, cantidadPersonas);
+
+        cant_personas.setText("Cantidad de personas: " + cantidadPersonas);
+        posicion_comienzo.setText("Posición de la persona que comienza: " + (comienzo + 1));
+
+
+        hiloControl = new Runnable() {
+            @Override
+            public void run() {
+                comenzarEnDireccionIndicada(iter, direccion);
+            }
+        };
+        hilo = new Thread(hiloControl);
+    }
+
 }

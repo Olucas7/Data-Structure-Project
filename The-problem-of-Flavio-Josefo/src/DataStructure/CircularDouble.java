@@ -1,7 +1,7 @@
 package DataStructure;
 
-import java.util.Iterator;
 import java.util.ListIterator;
+import java.util.NoSuchElementException;
 
 /**
  *
@@ -17,60 +17,57 @@ public class CircularDouble<E> implements List<E> {
     public boolean addFirst(E e) {
         NodeListDouble<E> addNewF = new NodeListDouble(e);
 
-        if (this.isEmpty()) {
+        if (e == null) {
             addNewF.setNext(addNewF);
             addNewF.setPrevious(addNewF);
-            setHeader(addNewF);
-            setLast(addNewF);
-            realSize++;
+            header = addNewF;
+            last = header;
 
         } else {
-            addNewF.setNext(header);
-            addNewF.setPrevious(last);
+            addNewF.setPrevious(addNewF);
+            last.setNext(addNewF);
             header.setPrevious(addNewF);
-            last.setNext(header);
-            setHeader(addNewF);
-            realSize++;
-
+            addNewF.setNext(header);
+            header = addNewF;
         }
-
+        realSize++;
         return true;
     }
 
     @Override
     public boolean addLast(E e) {
-        NodeListDouble<E> addNewL = new NodeListDouble(e);
+        NodeListDouble<E> nodo_aux = new NodeListDouble(e);
 
-        if (this.isEmpty()) {
-            addNewL.setNext(addNewL);
-            addNewL.setPrevious(addNewL);
-            setHeader(addNewL);
-            setLast(addNewL);
-            realSize++;
+        if (e == null) {
+            return false;
+        } else if (isEmpty()) {
+            nodo_aux.setNext(nodo_aux);
+            nodo_aux.setPrevious(nodo_aux);
+            header = nodo_aux;
+            last = header;
 
         } else {
-            addNewL.setNext(header);
-            addNewL.setPrevious(last);
-            header.setPrevious(addNewL);
-            last.setNext(addNewL);
-            setLast(addNewL);
-            realSize++;
+            nodo_aux.setPrevious(last);
+            last.setNext(nodo_aux);
+            header.setPrevious(nodo_aux);
+            nodo_aux.setNext(header);
+            last = nodo_aux;
         }
+        realSize++;
         return true;
     }
 
     @Override
     public E removeFirst() {
-
         if (isEmpty()) {
             return null;
         } else {
-            E eliminateF = getHeader().getContent();
+            E eliminateF = getFirst();
             last.setNext(header.getNext());
             header.getNext().setPrevious(last);
             header.setNext(null);
             header.setPrevious(null);
-            setHeader(header.getNext());
+            setHeaderNode(header.getNext());
             realSize--;
             return eliminateF;
         }
@@ -81,37 +78,15 @@ public class CircularDouble<E> implements List<E> {
         if (isEmpty()) {
             return null;
         } else {
-            E eliminateLast = getLast().getContent();
+            E eliminateLast = getLastNode().getContent();
             header.setPrevious(last.getPrevious());
             last.getPrevious().setNext(header);
             last.setNext(null);
             last.setPrevious(null);
-            setLast(last.getPrevious());
+            setLastNode(last.getPrevious());
             realSize--;
             return eliminateLast;
         }
-    }
-
-    @Override
-    public int size() {
-        return realSize;
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return header == null;
-    }
-
-    @Override
-    public void clear() {
-        setHeader(null);
-        setLast(null);
-        realSize = 0;
-    }
-
-    @Override
-    public void add(int index, E element) {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -152,153 +127,101 @@ public class CircularDouble<E> implements List<E> {
         return null;
     }
 
-    public NodeListDouble<E> buscar(int index) {
-
-        if (isEmpty() || index < 0 || index >= realSize) {
-            return null;
-        }
-        NodeListDouble<E> traveller = header;
-        if (header == last) {
-            header = last = null;
-        } else if (index == 0) {
-            NodeListDouble<E> temp = header;
-            header = header.getNext();
-            temp.setNext(null);
-            realSize--;
-            return temp;
-        } else if (index == realSize - 1) {
-            NodeListDouble<E> temp2 = last;
-            last = last.getPrevious();
-            last.setNext(null);
-            temp2.setPrevious(null);
-            realSize--;
-            return temp2;
-        } else {
-            for (int i = 0; i < realSize; i++) {
-                if (i + 1 == index) {
-                    NodeListDouble<E> noWanted = traveller.getNext();
-                    traveller.setNext(noWanted.getNext());
-                    noWanted.getNext().setPrevious(traveller);
-                    noWanted.setNext(null);
-                    noWanted.setPrevious(null);
-                    realSize--;
-                    return noWanted;
+    public NodeListDouble<E> getNode(int index) {
+        NodeListDouble<E> nodoEncontrado = null;
+        if (!isEmpty()) {
+            if (index == 0) {
+                nodoEncontrado = header;
+            } else {
+                if (index > 0 && index < realSize) {
+                    NodeListDouble<E> aux = header;
+                    for (int i = 0; i < realSize - 1; i++) {
+                        if (i == index - 1) {
+                            NodeListDouble<E> mod = aux.getNext();
+                            nodoEncontrado = mod;
+                        } else {
+                            aux = aux.getNext();
+                        }
+                    }
                 }
-                traveller = traveller.getNext();
             }
         }
-        return null;
+        return nodoEncontrado;
+
     }
 
-    private NodeListDouble<E> nodeIndexForward(int index) {
-        if (isEmpty()) {
-            return new NodeListDouble<>(null);
-        }
-        NodeListDouble<E> node = last.getNext();
-        int i = 0;
-        while (i < index) {
-            node = node.getNext();
-            i++;
-        }
-        return node;
+    @Override
+    public int size() {
+        return realSize;
     }
 
-    private NodeListDouble<E> nodeIndexBackward(int index) {
-        if (isEmpty()) {
-            return new NodeListDouble<>(null);
-        }
-        NodeListDouble<E> node = last;
-        int i = this.realSize - 1;
-        while (i > index) {
-            node = node.previous;
-            i--;
-        }
-        return node;
+    @Override
+    public void clear() {
+        setHeaderNode(null);
+        setLastNode(null);
+        realSize = 0;
     }
 
     @Override
     public E get(int index) {
-        NodeListDouble<E> node;
-        if (isEmpty() || index < 0 || index >= realSize) {
-            return null;
-        } else {
-            int cont = 0;
-            node = header;
-            while (cont != index) {
-                cont++;
-                node = node.getNext();
+        E nodoEncontrado = null;
+        if (!isEmpty()) {
+            if (index == 0) {
+                nodoEncontrado = header.getContent();
+            } else {
+                if (index > 0 && index < realSize) {
+                    NodeListDouble<E> aux = header;
+                    for (int i = 0; i < realSize - 1; i++) {
+                        if (i == index - 1) {
+                            NodeListDouble<E> mod = aux.getNext();
+                            nodoEncontrado = mod.getContent();
+                        } else {
+                            aux = aux.getNext();
+                        }
+                    }
+                }
             }
-            return node.getContent();
         }
+        return nodoEncontrado;
     }
 
-    @Override
-    public boolean set(int index, E element) {
-        NodeListDouble<E> node;
-        if (index == 0) {
-            last.getNext().setContent(element);
-            return true;
-        } else if (index - 1 == realSize) {
-            last.setContent(element);
-            return true;
-        } else if (element == null || index >= realSize || index < 0) {
-            return false;
-        } else if (index >= (realSize - 1) / 2) {
-            node = nodeIndexForward(index);
-        } else {
-            node = nodeIndexBackward(index);
-        }
-        node.setContent(element);
-        return true;
+    public boolean isEmpty() {
+        return header == null;
     }
 
-    public NodeListDouble<E> getHeader() {
+    public NodeListDouble getHeaderNode() {
         return header;
     }
 
-    public void setHeader(NodeListDouble<E> header) {
+    public void setHeaderNode(NodeListDouble<E> header) {
         this.header = header;
+
     }
 
-    public NodeListDouble<E> getLast() {
+    public NodeListDouble<E> getLastNode() {
         return last;
     }
 
-    public void setLast(NodeListDouble<E> last) {
+    public void setLastNode(NodeListDouble<E> last) {
         this.last = last;
     }
 
-    public int getSize() {
-        return realSize;
+    @Override
+    public E getLast() {
+        return last.getContent();
     }
 
-    public void setSize(int size) {
-        this.realSize = size;
+    @Override
+    public E getFirst() {
+        return header.getContent();
+
     }
 
+    @Override
     public boolean remove(E element) {
-
         NodeListDouble<E> actual = header;
         NodeListDouble<E> anterior = last;
         boolean eliminado = false;
-
-//        if (!isEmpty()) {
-//            if (header == last && header.content == element) {
-//                header = last = null;
-//            } else {
-//                if (header.content == element) {
-//                    header.next.previous = last;
-//                    last.next = header.next;
-//                    header = header.next;
-//                } else {
-//                    if (last.content == element) {
-//                        last.previous.next = header;
-//
-//                    }
-//
-//                }
-//            }
-//        }
         do {
             if (actual.getContent() == element) {
                 if (actual == header) {
@@ -319,7 +242,181 @@ public class CircularDouble<E> implements List<E> {
             actual = actual.getNext();
         } while (actual != header && eliminado == false);
         return eliminado;
+    }
+
+    @Override
+    public Iterator<E> iterator() {
+        return new MyIterator<E>();
+    }
+
+    public class MyIterator<E> implements Iterator<E> {
+
+        NodeListDouble<E> n = getHeaderNode();
+
+        @Override
+        public boolean hasNext() {
+            return n != null;
+        }
+
+        @Override
+        public E next() {
+            E elemento = null;
+            elemento = n.getContent();
+            n = n.getNext();
+            return elemento;
+        }
 
     }
 
+    public ListIterator<E> IterarNode(int i) {
+        ListIterator<E> iter = new ListIterator<E>() {
+            NodeListDouble<E> nodoViajero = getNode(i);
+            int puntero = realSize;
+
+            @Override
+            public boolean hasNext() {
+                boolean verificar = false;
+                if (puntero != 0 && nodoViajero != null) {
+                    verificar = true;
+                }
+                return verificar;
+            }
+
+            @Override
+            public E next() {
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
+                } else {
+                    E elemnt = nodoViajero.getContent();
+                    nodoViajero = nodoViajero.getNext();
+                    return elemnt;
+                }
+            }
+
+            @Override
+            public boolean hasPrevious() {
+                boolean verificar = false;
+
+                if (puntero != 0 && nodoViajero != null) {
+                    verificar = true;
+                }  
+                    
+                return verificar;
+
+            }
+
+            @Override
+            public E previous() {
+                nodoViajero = nodoViajero.getPrevious();
+                E elemento = nodoViajero.getContent();
+                return elemento;
+            }
+
+            @Override
+            public int nextIndex() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public int previousIndex() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void set(E e) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void add(E e) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+        };
+        return iter;
+
+    }
+
+    public ListIterator<E> listIterator() {
+        ListIterator<E> iter = new ListIterator() {
+            NodeListDouble<E> nodoViajero = header;
+            int puntero = realSize;
+
+            @Override
+            public boolean hasNext() {
+                boolean verify = false;
+
+                if (puntero != 0 && nodoViajero != null) {
+                    verify = true;
+                } else {
+                    puntero = realSize;
+                }
+
+                return verify;
+            }
+
+            @Override
+            public E next() {
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
+                } else {
+                    E elemento = nodoViajero.getContent();
+                    nodoViajero = nodoViajero.getNext();
+                    puntero--;
+                    return elemento;
+                }
+            }
+
+            @Override
+            public boolean hasPrevious() {
+                boolean verify = false;
+
+                if (puntero != 0 && nodoViajero != null) {
+                    verify = true;
+                } else {
+                    puntero = realSize;
+                }
+
+                return verify;
+            }
+
+            @Override
+            public E previous() {
+                nodoViajero = nodoViajero.getPrevious();
+                E elemento = nodoViajero.getContent();
+                puntero--;
+                return elemento;
+            }
+
+            @Override
+            public int nextIndex() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public int previousIndex() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void set(Object e) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void add(Object e) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+        };
+        return iter;
+    }
 }

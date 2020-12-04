@@ -7,31 +7,28 @@ import java.util.Iterator;
  * @author oscarlucas7
  * @param <E>
  */
-public interface List<E> {
+public interface List<E> extends Iterable<E>{
 
-    public boolean addFirst(E e);
+    boolean addFirst(E e);
 
-    public boolean addLast(E e);
+    boolean addLast(E e);
 
-    public E removeFirst();
+    E removeFirst();
 
-    public E removeLast();
+    E removeLast();
 
-    public int size();
+    boolean remove(E element);
 
-    public boolean isEmpty();
+    int size();
 
-    public void clear();
+    E getFirst();
 
-    public void add(int index, E element);
+    E getLast();
 
-    public E remove(int index);
+    void clear();
 
-    public E get(int index);
+    E remove(int index);
 
-    public boolean set(int index, E element);
-
-    @Override
-    public String toString();
+    E get(int index);
 
 }

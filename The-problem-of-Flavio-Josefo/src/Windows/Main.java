@@ -18,20 +18,20 @@ import javafx.stage.Stage;
  * @author Jeanca
  */
 public class Main extends Application {
-    
-       @Override
-    public void start(Stage stage) throws Exception{
-        
-        MainWindow scene= new MainWindow(stage);
+
+    @Override
+    public void start(Stage stage) throws Exception {
+        MainWindow scene = new MainWindow(stage);
         stage.setScene(scene.getScene());
         stage.setTitle("GAME");
-        stage.show();   
+        stage.show();
     }
+
     /**
      * @param args
      */
-    public static void main (String[]args){
+    public static void main(String[] args) {
         Application.launch(args);
     }
-    
+
 }

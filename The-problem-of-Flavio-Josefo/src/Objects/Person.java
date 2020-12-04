@@ -5,8 +5,8 @@
  */
 package Objects;
 
-import static java.lang.Math.cos;
-import static java.lang.Math.sin;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 /**
  *
@@ -14,42 +14,28 @@ import static java.lang.Math.sin;
  */
 public class Person {
 
-    private  String url;
-    private double angle;
-    private double[] posicion;
+    private ImageView persona_imagen;
+    private boolean alive;
 
-    public Person(int i,double angle) {
-        this.angle = angle;
-        double positionX = Simulacion.CENTERX + Simulacion.separacion_personas * cos(angle);
-        double positionY = Simulacion.CENTERY + Simulacion.separacion_personas * sin(angle);
-        posicion = new double[]{positionX, positionY};
-        url = "p" + i;
+    public ImageView getPersona_imagen() {
+        return persona_imagen;
     }
 
-    public double getAngle() {
-        return angle;
+    public void setPersona_imagen(Image persona_imagen) {
+        this.persona_imagen.setImage(persona_imagen);
     }
 
-    public void setAngle(double angle) {
-        this.angle = angle;
+    public boolean isAlive() {
+        return alive;
     }
 
-    public double[] getPosition() {
-        return posicion;
+    public void setAlive(boolean alive) {
+        this.alive = alive;
     }
 
-    public void setPosition(double[] position) {
-        this.posicion = position;
+    public Person(ImageView persona_imagen, boolean alive) {
+        this.persona_imagen = persona_imagen;
+        this.alive = alive;
     }
-
-    public boolean isOcupied() {
-        return true;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-   
 
 }
